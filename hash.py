@@ -2,6 +2,7 @@ from Crypto.Hash import SHA256
 import bcrypt
 import secrets
 import string
+import random
 
 # limited digest to 8 bits
 def hash_input(b: bytes) -> str:
@@ -12,7 +13,7 @@ def random_string(length=8) -> str:
   return ''.join(secrets.choice(chars) for i in range(length))
 
 # weak collision resistance
-def find_weak_collision() -> str:
+def find_wcr() -> str:
   m0 = b'example'
   digest1 = hash_input(m0)
   m1 = random_string(len(m0)).encode('utf-8')
@@ -21,7 +22,23 @@ def find_weak_collision() -> str:
   while digest2 != digest1:
     m1 = random_string(len(m0)).encode('utf-8')
     digest2 = hash_input(m1)
-  print(f'COLLISION FOUND:\n m0: {m0} | digest: {digest1} \n m1: {m1} | digest: {digest2}')
+  print(f'\n\tCOLLISION FOUND:\n m0: {m0} | digest: {digest1} \n m1: {m1} | digest: {digest2}\n')
+
+# strong collision resistance
+def find_scr() -> str:
+  digests = {} # digest : message
+  m0 = random_string(random.randint(1, 10)).encode('utf-8')
+  digest1 = hash_input(m0)
+  digests[digest1] = m0
+
+  while True:
+    m1 = random_string(random.randint(1, 10)).encode('utf-8')
+    digest2 = hash_input(m1)
+    if digest2 in digests:
+      print(f'\n\tCOLLISION FOUND:\n m0: {m0} | digest: {digest1} \n m1: {m1} | digest: {digest2}\n')
+      break
+    else:
+      digests[m1] = digest2
 
 if __name__ == '__main__':
-  find_weak_collision()
+  find_scr()
