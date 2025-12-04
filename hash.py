@@ -1,11 +1,14 @@
 from Crypto.Hash import SHA256
 from pypdf import PdfReader
 import os
-#import nltk
+import nltk
 import bcrypt
 import secrets
 import string
 import random
+
+from nltk.corpus import words
+nltk.download('words')
 
 # limited digest to 8 bits
 def hash_input(b: bytes) -> str:
@@ -43,27 +46,5 @@ def find_scr():
     else:
       digests[m1] = digest2
 
-# start breaking the hashes:
-# https://www.geeksforgeeks.org/python/working-with-pdf-files-in-python/
-def break_hash():
-  reader = PdfReader("shadow.pdf")
-  page = reader.pages[0]
-  print(page.extract_text())
-  page_data = page.extract_text().split('\n')
-  i = 0
-  while i < 16:
-    i += 1
-    if(os.fork() == 0):
-      print(f"fork {i} {os.getpid()}")
-      os._exit(0)
-  # wait for child processes
-  while 1:
-    try:
-      pid, status = os.wait()
-    except ChildProcessError:
-      break
-
-
 if __name__ == '__main__':
   find_scr()
-  print(break_hash())
